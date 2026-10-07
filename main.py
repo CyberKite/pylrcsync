@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from collections.abc import Iterator
+from collections.abc import Iterator, Iterable
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -37,6 +37,26 @@ def uncursed(stdscr: curses.window) -> Iterator[None]:
     finally:
         curses.reset_prog_mode()
         stdscr.clearok(True)
+
+
+@dataclass
+class FormatFragment:
+    text: str = ""
+    attrs: int = 0
+
+    def __str__(self) -> str:
+        return self.text
+
+
+def addfrags(
+    win: curses.window,
+    y: int,
+    x: int,
+    fragments: Iterable[FormatFragment],
+) -> None:
+    win.move(y, x)
+    for fragment in fragments:
+        win.addstr(fragment.text, fragment.attrs)
 
 
 @dataclass
@@ -78,6 +98,29 @@ def ellipsize(text: str, width: int) -> str:
     if width <= 1:
         return text[:width]
     return text[:width - 1] + "…"
+
+
+def ellipsize_frags(
+    fragments: Iterable[FormatFragment],
+    width: int,
+) -> tuple[FormatFragment, ...]:
+    result = []
+
+    if width <= 0:
+        return ()
+
+    for frag in fragments:
+        if len(frag.text) <= width:
+            result.append(frag)
+            width -= len(frag.text)
+        else:
+            result.append(FormatFragment(
+                ellipsize(frag.text, width),
+                frag.attrs,
+            ))
+            break
+
+    return tuple(result)
 
 
 def clamp_viewport(state: State, line_count: int, height: int):
