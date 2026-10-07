@@ -240,7 +240,7 @@ def handle_key(
             state.message = (FormatFragment('E492: Not an editor command',
                                             curses.A_BOLD),)
         case 'y':
-            state.message = (FormatFragment('0 lines yanked'),)
+            state.message = (FormatFragment('0 lines yanked', curses.A_DIM),)
         case 'd' | 'c' | 'R' | 'i':
             state.message = (FormatFragment(
                 'E21: Cannot make changes, modifiable is off', curses.A_BOLD),)
@@ -292,11 +292,12 @@ def handle_key(
         case 'u':
             if state.hist:
                 state.undo_pop()
-                state.message = (FormatFragment("Undid "),
+                state.message = (FormatFragment("Undid ", curses.A_DIM),
                                  FormatFragment(str(1)),
-                                 FormatFragment(" operation"),)
+                                 FormatFragment(" operation", curses.A_DIM),)
             else:
-                state.message = (FormatFragment("Already at oldest change"),)
+                state.message = (FormatFragment("Already at oldest change",
+                                                curses.A_BOLD),)
         case '\n':
             ts = state.lyrics[state.cursor].timestamp
             if ts is not None:
@@ -328,7 +329,9 @@ def handle_key(
                 state.modified = False
             else:
                 state.message = (
-                    FormatFragment("No changes to save, wrote it anyway."),
+                    FormatFragment("No changes to save. ", curses.A_DIM),
+                    FormatFragment("Wrote it anyway.",
+                                   curses.A_DIM | curses.A_ITALIC),
                 )
         case 'x':
             write_lrc(lrc_file, state.lyrics)
