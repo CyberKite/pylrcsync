@@ -17,6 +17,7 @@ An LRC timestamp editor for video terminals
 - `h` / `l` — adjust timestamp by -/+ 50 ms
 - `H` / `L` — adjust timestamp by -/+ 250 ms
 - `Enter` — seek to current line and play
+- `e` — edit buffer in text editor
 - `s` — seek to current line
 - `←` / `→` — seek -/+ 1 second
 - `p` — toggle playback
