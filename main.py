@@ -170,7 +170,8 @@ def handle_key(
     key: str | int,
     state: State,
     mpv: mpv_client.Mpv,
-    lrc_file: str
+    lrc_file: str,
+    stdscr: curses.window
 ) -> None:
     # TODO: Think of a context object. Or bundle it all into a State.
     match key:
@@ -351,7 +352,7 @@ def app(
 
             stdscr.clearok(True)
         elif key is not None:
-            handle_key(key, state, mpv, lrc_file)
+            handle_key(key, state, mpv, lrc_file, stdscr)
 
         update_status(status, state)
         draw_editor(editor, state)
