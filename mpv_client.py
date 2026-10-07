@@ -60,6 +60,8 @@ class Mpv:
         self.send(["set", name, value])
 
     def pause(self) -> None:
+        # this should under no circumstances write state.playing directly
+        # as that would completely break my code
         self.set_property("pause", True)
 
     def play(self) -> None:
