@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass, field
+from collections.abc import Iterator
+from contextlib import contextmanager
 from copy import deepcopy
 import argparse
 import curses
@@ -17,6 +19,17 @@ logging.basicConfig(
     filename="/tmp/pylrcedit.log",
     level=logging.DEBUG,
 )
+
+
+@contextmanager
+def uncursed(stdscr: curses.window) -> Iterator[None]:
+    curses.def_prog_mode()
+    curses.endwin()
+    try:
+        yield
+    finally:
+        curses.reset_prog_mode()
+        stdscr.clearok(True)
 
 
 @dataclass
