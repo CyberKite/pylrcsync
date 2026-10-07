@@ -71,7 +71,7 @@ class State:
     running: bool = True
     lyrics: list[liblrc.Line] = field(default_factory=list)
     hist: list[list[liblrc.Line]] = field(default_factory=list)
-    message: str = ""
+    message: tuple[FormatFragment, ...] = ()
 
     def undo_push(self) -> None:
         self.hist.append(deepcopy(self.lyrics))
@@ -201,7 +201,7 @@ def update_status(status: curses.window, state: State) -> None:
 
     right_start = w - len(pos_indicator) - 10
     message_space = right_start - 20 - 1
-    status.addstr(0, 20, ellipsize(state.message, message_space))
+    addfrags(status, 0, 20, ellipsize_frags(state.message, message_space))
 
     if state.hist:
         status.addstr(0, right_start, f"[{len(state.hist)}]")
@@ -220,22 +220,34 @@ def handle_key(
     # TODO: Think of a context object. Or bundle it all into a State.
     match key:
         case '\x1b':
-            state.message = '-- NORMAL --'
+            state.message = (FormatFragment('-- NORMAL --', curses.A_BOLD),)
         case 'v':
-            state.message = '-- TEXTUAL --'
+            state.message = (FormatFragment('-- TEXTUAL --', curses.A_BOLD),)
         case '/':
-            state.message = 'Pattern not found: .*'
+            state.message = (
+                FormatFragment('Pattern not found: .*', curses.A_BOLD),)
         case '?':
-            state.message = 'jk | Space | <-/-> | Enter | hl | euwq'
+            pipe = FormatFragment(' | ', curses.A_DIM)
+            state.message = (
+                FormatFragment('jk'), pipe,
+                FormatFragment('Space'), pipe,
+                FormatFragment('<-/->'), pipe,
+                FormatFragment('Enter'), pipe,
+                FormatFragment('hl'), pipe,
+                FormatFragment('euwq'),
+            )
         case ':':
-            state.message = 'E492: Not an editor command'
+            state.message = (FormatFragment('E492: Not an editor command',
+                                            curses.A_BOLD),)
         case 'y':
-            state.message = '0 lines yanked'
+            state.message = (FormatFragment('0 lines yanked'),)
         case 'd' | 'c' | 'R' | 'i':
-            state.message = 'E21: Cannot make changes, modifiable is off'
+            state.message = (FormatFragment(
+                'E21: Cannot make changes, modifiable is off', curses.A_BOLD),)
         case 'q':
             if state.modified:
-                state.message = "Refusing, file has been modified."
+                state.message = (FormatFragment(
+                    "Refusing, file has been modified.", curses.A_BOLD),)
             else:
                 state.running = False
         case 'Q':
@@ -280,9 +292,11 @@ def handle_key(
         case 'u':
             if state.hist:
                 state.undo_pop()
-                state.message = f"Undid {1} operation"
+                state.message = (FormatFragment("Undid "),
+                                 FormatFragment(str(1)),
+                                 FormatFragment(" operation"),)
             else:
-                state.message = "Already at oldest change"
+                state.message = (FormatFragment("Already at oldest change"),)
         case '\n':
             ts = state.lyrics[state.cursor].timestamp
             if ts is not None:
@@ -310,10 +324,12 @@ def handle_key(
         case 'w':
             write_lrc(lrc_file, state.lyrics)
             if state.modified:
-                state.message = "Saved."
+                state.message = (FormatFragment("Saved.", curses.A_DIM),)
                 state.modified = False
             else:
-                state.message = "No changes to save, wrote it anyway."
+                state.message = (
+                    FormatFragment("No changes to save, wrote it anyway."),
+                )
         case 'x':
             write_lrc(lrc_file, state.lyrics)
             state.running = False
@@ -339,11 +355,19 @@ def handle_key(
                     # the editor creates a new inode. Or sth evil like that.
                     state.lyrics = read_lrc(temp_lrc_file.name)
             except subprocess.CalledProcessError as e:
-                state.message = f"Editor exited with status {e.returncode}"
-            except UnicodeDecodeError as e:
-                state.message = f"Editor wrote invalid Unicode (…?): {e}"
+                state.message = (
+                    FormatFragment("Editor exited with status "),
+                    FormatFragment(str(e.returncode), curses.A_BOLD),
+                )
+            except UnicodeDecodeError:
+                state.message = (
+                    FormatFragment("Editor wrote invalid Unicode (…?)",
+                                   curses.A_BOLD),
+                )
             except OSError as e:
-                state.message = f"External edit failed: {e}"
+                state.message = (
+                    FormatFragment("External edit failed: ", curses.A_BOLD),
+                    FormatFragment(str(e)),)
             finally:
                 # this works because we poll and mpv can't
                 # update us while we block.
