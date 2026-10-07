@@ -43,7 +43,7 @@ An LRC timestamp editor for video terminals
 
 ## Contributing
 
-Vibe-coded, but human-reviewed PRs welcome ---
+Vibe-coded PRs welcome so long as they're human-reviewed ---
 If you can't write Python, consider submitting a feature request instead.
 
 Do note that I am extremely pedantic and will probably
