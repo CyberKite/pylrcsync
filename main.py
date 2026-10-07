@@ -8,6 +8,7 @@ import curses
 import curses.ascii
 import logging
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -273,6 +274,38 @@ def handle_key(
         case 'x':
             write_lrc(lrc_file, state.lyrics)
             state.running = False
+        case 'e':
+            try:
+                mpv.pause()
+                with tempfile.NamedTemporaryFile(
+                    mode="w",
+                    suffix=".lrc",
+                    encoding="utf-8",
+                ) as temp_lrc_file:
+                    state.undo_push()
+                    state.modified = True
+                    temp_lrc_file.write(liblrc.serialize(state.lyrics))
+                    temp_lrc_file.flush()
+
+                    with uncursed(stdscr):
+                        subprocess.run((*shlex.split(EDITOR),
+                                        temp_lrc_file.name),
+                                       check=True)
+
+                    # there's a reason we're doing it this way, namely in case
+                    # the editor creates a new inode. Or sth evil like that.
+                    state.lyrics = read_lrc(temp_lrc_file.name)
+            except subprocess.CalledProcessError as e:
+                state.message = f"Editor exited with status {e.returncode}"
+            except UnicodeDecodeError as e:
+                state.message = f"Editor wrote invalid Unicode (…?): {e}"
+            except OSError as e:
+                state.message = f"External edit failed: {e}"
+            finally:
+                # this works because we poll and mpv can't
+                # update us while we block.
+                if state.playing:
+                    mpv.play()
 
 
 def read_lrc(lrc_file: str) -> list[liblrc.Line]:
