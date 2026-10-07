@@ -8,6 +8,7 @@ import curses
 import curses.ascii
 import logging
 import os
+import shutil
 import subprocess
 import tempfile
 
@@ -19,6 +20,11 @@ logging.basicConfig(
     filename="/tmp/pylrcedit.log",
     level=logging.DEBUG,
 )
+
+
+EDITOR = (os.environ.get("VISUAL")
+          or os.environ.get("EDITOR")
+          or ("vim" if shutil.which("vim") else "vi"))
 
 
 @contextmanager
