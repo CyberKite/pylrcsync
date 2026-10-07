@@ -11,25 +11,31 @@ An LRC timestamp editor for video terminals
 
 ### Controls
 
-- `j` / `k` — move between lines
-- `Space` — timestamp current line and advance
-- `t` — timestamp current line
-- `h` / `l` — adjust timestamp by -/+ 50 ms
-- `H` / `L` — adjust timestamp by -/+ 250 ms
-- `Enter` — seek to current line and play
-- `e` — edit buffer in text editor
-- `s` — seek to current line
-- `←` / `→` — seek -/+ 1 second
-- `p` — toggle playback
-- `P` — pause
-- `[` / `]` — decrease/increase playback speed
-- `{` / `}` — halve/double playback speed
-- `=` — reset playback speed
-- `u` — undo
-- `w` — save
-- `x` — save and quit
-- `q` — quit if unmodified
-- `Q` — quit without saving
+| Bind      | Action                                |
+|-----------|---------------------------------------|
+| `j` / `k` | move between lines                    |
+| `Space`   | timestamp current line and advance    |
+| `←` / `→` | seek song by 1 second                 |
+| `p`       | toggle playback                       |
+| `[` / `]` | decrease/increase playback speed      |
+|           |                                       |
+| `h` / `l` | adjust timestamp by -/+ 50 ms         |
+| `H` / `L` | adjust timestamp by -/+ 250 ms        |
+| `Enter`   | seek to current line and play         |
+|           |                                       |
+| `e`       | edit buffer in text editor            |
+| `u`       | undo                                  |
+| `w`       | save                                  |
+| `q`       | quit if unmodified                    |
+|           |                                       |
+| `{` / `}` | halve/double playback speed           |
+| `=`       | reset playback speed                  |
+|           |                                       |
+| `t`       | timestamp current line                |
+| `s`       | seek to current line, don't play      |
+| `P`       | pause                                 |
+| `x`       | save and quit                         |
+| `Q`       | quit without saving                   |
 
 ## Requirements
 
