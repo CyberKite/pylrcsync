@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from dataclasses import dataclass, field
 from collections.abc import Iterator
 from contextlib import contextmanager
 from copy import deepcopy
+from dataclasses import dataclass, field
 import argparse
 import curses
 import curses.ascii
