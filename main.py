@@ -183,7 +183,7 @@ def handle_key(
         case '/':
             state.message = 'Pattern not found: .*'
         case '?':
-            state.message = 'No help, only despair. (Read sources instead)'
+            state.message = 'jk | Space | <-/-> | Enter | hl | euwq'
         case ':':
             state.message = 'E492: Not an editor command'
         case 'y':

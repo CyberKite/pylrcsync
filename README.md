@@ -18,6 +18,7 @@ An LRC timestamp editor for video terminals
 | `←` / `→` | seek song by 1 second                 |
 | `p`       | toggle playback                       |
 | `[` / `]` | decrease/increase playback speed      |
+| `?`       | show help                             |
 |           |                                       |
 | `h` / `l` | adjust timestamp by -/+ 50 ms         |
 | `H` / `L` | adjust timestamp by -/+ 250 ms        |
